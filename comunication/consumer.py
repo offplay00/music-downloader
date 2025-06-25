@@ -19,10 +19,10 @@ class ChatConsumer(AsyncWebsocketConsumer):
         await self.accept()
        
 
-    async def receive(self, text_data):  
+    async def receive(self, text_data):
         # Parse the incoming message
-        logger.debug(f"Received song request for")  
-        data = json.loads(text_data)  
+        logger.debug(f"Received song request for")
+        data = json.loads(text_data)
         if data.get('message') == SONG_REQUEST:
             song_name = data.get('song_name')
 
@@ -38,4 +38,5 @@ class ChatConsumer(AsyncWebsocketConsumer):
             }
             result, status = await sync_to_async(handle_url_search)(input_data)
 
-            await self.send(text_data=str(result))  
+            await self.send(text_data=str(result))
+    
