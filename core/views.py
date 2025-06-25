@@ -14,7 +14,7 @@ logger = logging.getLogger('core')
 
 class SongViewSet(ModelViewSet):
     queryset = Song.objects.all()
-    serializer_class = SongSerializer
+    serializer_class = SongSerializer 
 
     @action(detail=False, methods=['get'], url_path='songs') 
     def list_songs(self, request):
