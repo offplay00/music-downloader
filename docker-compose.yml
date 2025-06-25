@@ -1,0 +1,39 @@
+version: '3.9'
+
+services:
+  db:
+    image: postgres:15
+    environment:
+      POSTGRES_DB: mydb
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: password
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+
+  web:
+    image: offplay/music-downloader:latest
+    command: ["/bin/sh", "-c","./entrypoint.sh"]
+    volumes:
+      - .:/code
+      - C:/Users/simon/Desktop/music:/music
+      - ./entrypoint.sh:/code/entrypoint.sh
+    ports:
+      - "8000:8000"
+      -  5678:5678
+    depends_on:
+      - db
+    environment:
+      - DB_NAME=mydb
+      - DB_USER=user
+      - DB_PASSWORD=password
+      - DB_HOST=db
+      - MUSIC_PATH=/music
+
+volumes:
+  postgres_data:
+
+networks:
+  default:
+    driver: bridge
