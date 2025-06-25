@@ -16,7 +16,7 @@ class SongViewSet(ModelViewSet):
     queryset = Song.objects.all()
     serializer_class = SongSerializer
 
-    @action(detail=False, methods=['get'], url_path='songs')
+    @action(detail=False, methods=['get'], url_path='songs') 
     def list_songs(self, request):
         serializer = SongSerializer(self.queryset, many=True)
         return Response(serializer.data)

@@ -9,7 +9,7 @@ from asgiref.sync import sync_to_async
 
 # Custom ID for communication
 SONG_REQUEST = "song_request"
-URL_REQUEST = "url_request"
+URL_REQUEST = "url_request" 
 logger = logging.getLogger('comunication') 
 
 class ChatConsumer(AsyncWebsocketConsumer):
