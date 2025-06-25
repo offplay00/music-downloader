@@ -21,7 +21,7 @@ class ChatConsumer(AsyncWebsocketConsumer):
 
     async def receive(self, text_data):  
         # Parse the incoming message
-        logger.debug(f"Received song request for") 
+        logger.debug(f"Received song request for")  
         data = json.loads(text_data)  
         if data.get('message') == SONG_REQUEST:
             song_name = data.get('song_name')
