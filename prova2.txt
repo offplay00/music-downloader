@@ -19,7 +19,7 @@ class ChatConsumer(AsyncWebsocketConsumer):
         await self.accept()
        
 
-    async def receive(self, text_data):
+    async def receive(self, text_data): 
         # Parse the incoming message
         logger.debug(f"Received song request for")
         data = json.loads(text_data)
