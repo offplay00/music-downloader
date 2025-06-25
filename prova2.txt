@@ -1,42 +1,51 @@
 import json
 import logging
-from channels.generic.websocket import AsyncWebsocketConsumer
-from core.models import Song
-from core.business_logic import handle_song_search, handle_url_search
-from core.views import SearchSongs
-from rest_framework.response import Response
+
 from asgiref.sync import sync_to_async
+from channels.generic.websocket import AsyncWebsocketConsumer
 
 # Custom ID for communication
 SONG_REQUEST = "song_request"
 URL_REQUEST = "url_request"
-logger = logging.getLogger('comunication') 
+logger = logging.getLogger("comunication")
+
 
 class ChatConsumer(AsyncWebsocketConsumer):
-   
     async def connect(self):
         logger.info("WebSocket connection established.")
         await self.accept()
-       
 
     async def receive(self, text_data):
         # Parse the incoming message
-        logger.debug(f"Received song request for")
-        data = json.loads(text_data)
-        if data.get('message') == SONG_REQUEST:
-            song_name = data.get('song_name')
+        try:
+            data = json.loads(text_data)
+            message_type = data.get("message")
 
-            input_data = {"data": song_name}
-            result, status = await sync_to_async(handle_song_search)(input_data)
+            if message_type == SONG_REQUEST:
+                song_name = data.get("song_name")
+                logger.debug(f"Received song request for: {song_name}")
+                input_data = {"data": song_name}
+                result, status = await sync_to_async(handle_song_search)(input_data)
+                await self.send(text_data=json.dumps(result))
 
-            await self.send(text_data=str(result))
-        elif data.get('message') == URL_REQUEST:
-            logger.debug(f"Received URL request for: {data}")
-            input_data = {
-                "url": data.get('url'),
-                "id" : data.get('id', None)  # Optional ID field
-            }
-            result, status = await sync_to_async(handle_url_search)(input_data)
+            elif message_type == URL_REQUEST:
+                url = data.get("url")
+                video_id = data.get("id")  # Optional ID field
+                logger.debug(f"Received URL request for: {url}, ID: {video_id}")
+                input_data = {"url": url, "id": video_id}
+                result, status = await sync_to_async(handle_url_search)(input_data)
+                await self.send(text_data=json.dumps(result))
+            else:
+                logger.warning(f"Unknown message type received: {message_type}")
+                await self.send(
+                    text_data=json.dumps({"error": "Unknown message type"})
+                )
 
-            await self.send(text_data=str(result))
-    
+        except json.JSONDecodeError:
+            logger.error("Failed to decode JSON data.")
+            await self.send(
+                text_data=json.dumps({"error": "Failed to decode JSON data"})
+            )
+        except Exception as e:
+            logger.exception("An error occurred during message processing.")
+            await self.send(text_data=json.dumps({"error": str(e)}))
