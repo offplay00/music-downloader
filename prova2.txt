@@ -38,5 +38,4 @@ class ChatConsumer(AsyncWebsocketConsumer):
             }
             result, status = await sync_to_async(handle_url_search)(input_data)
 
-            await self.send(text_data=str(result))
-    
+            await self.send(text_data=str(result)) 
